@@ -13,19 +13,48 @@ input user-item matrix, alpha, beta(regularizer), k(latent factors)
 arma::mat fill_random(arma::mat A,int a){
 	for(int i=0;i<A.n_rows;i++){
 		for(int j=0;j<A.n_cols;j++)
-			A(i,j) = (float)(rand()%a + 1);
+			A(i,j) = (float)(rand()%a) + 1;
 	}
 	return A;
 }
 
+arma::mat fill_random_norm(arma::mat A,int a){
+	for(int i=0;i<A.n_rows;i++){
+		for(int j=0;j<A.n_cols;j++)
+			A(i,j) = (float)(rand())/RAND_MAX;
+	}
+	return A;
+}
 
-arma::mat fill_random(arma::mat A){
+arma::mat fill_zero(arma::mat A){
 	for(int i=0;i<A.n_rows;i++){
 		for(int j=0;j<A.n_cols;j++)
 			A(i,j) = 0.0;
 	}
 	return A;
 }
+
+arma::vec return_row(arma::mat A,int index){
+	arma::vec B(A.n_cols);
+	for(int i=0;i<A.n_cols;i++)
+		B(i) = A(index,i);
+	return B;
+}
+
+arma::vec return_col(arma::mat A,int index){
+	arma::vec B(A.n_rows);
+	for(int i=0;i<A.n_rows;i++)
+		B(i) = A(i,index);
+	return B;
+}
+
+float dot_product(arma::vec A, arma::vec B, int size){
+	float prod = 0.0;
+	for(int i=0;i<size;i++)
+		prod+=A(i)*B(i);
+	return prod;
+}
+
 
 arma::mat calculate_error(arma::mat R,arma::mat P,arma::mat Q,float alpha,float beta,int steps,int d){
 	Q = Q.t();
@@ -69,26 +98,7 @@ arma::mat calculate_error(arma::mat R,arma::mat P,arma::mat Q,float alpha,float 
 	return R_bar;
 }
 
-arma::vec return_row(arma::mat A,int index){
-	arma::vec B(A.cols);
-	for(int i=0;i<A.cols;i++)
-		B(i) = A(index,i);
-	return B;
-}
 
-arma::vec return_col(arma::mat A,int index){
-	arma::vec B(A.rows);
-	for(int i=0;i<A.rows;i++)
-		B(i) = A(i,index);
-	return B;
-}
-
-float dot_product(arma::vec A, arma::vec B, int size){
-	float prod = 0.0;
-	for(int i=0;i<size;i++)
-		prod+=A(i)*B(i);
-	return prod;
-}
 
 void display(arma::mat A){
 	for(int i=0;i<A.n_rows;i++){
@@ -98,17 +108,25 @@ void display(arma::mat A){
 	}
 }
 
+void display(arma::vec A,int k){
+	for(int i=0;i<k;i++)
+		std::cout << A(k,1) << " ";
+}
+
 int main(int argc, char *argv[]){
-	int user = 5,item =4;
+	int user = 5,item =4; 
 	int k = 2,steps = 5000;
 	float alpha = 0.0002, beta = 0.01;
-	arma::mat R(5,4);
-	arma::mat R_bar(5,4);
+	arma::mat R = {{5,3,0,1},{4,0,0,1},{1,1,0,5},{1,0,0,4},{0,1,5,4}};
+	display(R);
+	arma::mat R_bar;
 	arma::mat P(5,k);
 	arma::mat Q(4,k);
-	P = fill_random(P,5);
-	Q = fill_random(Q,5);
-	R_bar = calculate_error(R,R_bar,P,Q,alpha,beta,steps,k);
+	arma::vec A;
+	arma::vec B;
+	P = fill_random_norm(P,4);
+	Q = fill_random_norm(Q,4);
+	R_bar = calculate_error(R,P,Q,alpha,beta,steps,k);	
 	display(R_bar);	
 	return 0;
 }
